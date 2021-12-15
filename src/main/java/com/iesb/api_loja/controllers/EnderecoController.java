@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iesb.api_loja.bo.CadastroBo;
 import com.iesb.api_loja.bo.ValidaDados;
+import com.iesb.api_loja.form.EnderecoForm;
 import com.iesb.api_loja.model.Endereco;
 import com.iesb.api_loja.model.Pessoa;
 import com.iesb.api_loja.repository.EnderecoRepository;
@@ -31,21 +32,21 @@ public class EnderecoController {
 	
 	@PostMapping(value = "cadastrarEnderecoEntrega")
     @ResponseBody
-    public ResponseEntity<?> cadastrarEnderecoEntrega(@RequestBody Endereco end, @RequestBody String cpf){
+    public ResponseEntity<?> cadastrarEnderecoEntrega(@RequestBody EnderecoForm end){
 		
-		Pessoa pessoa = pessoaRepository.buscaPessoaPorCpf(cpf);
+		Pessoa pessoa = pessoaRepository.buscaPessoaPorCpf(end.getCpf().trim());
 		if(pessoa == null) {
 			return new ResponseEntity<String>("ESTE CLIENTE NÃO ESTÁ CADASTRADO", HttpStatus.OK);
 		}
-		pessoa.getEnderecosUsuario().add(end);
-		end.setPessoa(pessoa);
-		Endereco endereco = CadastroBo.INSTANCE.cadastrarEnderecoEntrega(end);
+		
+		Endereco endereco = CadastroBo.INSTANCE.cadastrarEnderecoEntrega(end,pessoa);
 		
 		if(endereco != null) {
 			if(enderecoRepository.buscaEnderecoPorCep(end.getNumCep()) != null)
 				return new ResponseEntity<String>("ESTE ENDERECO JA FOI CADASTRADO", HttpStatus.OK);
-			
+			endereco.setPessoa(pessoa);		
 			endereco = enderecoRepository.save(endereco);
+			
 			pessoa = pessoaRepository.saveAndFlush(pessoa);
 			return new ResponseEntity<Endereco>(endereco, HttpStatus.CREATED);
 		}
@@ -58,21 +59,20 @@ public class EnderecoController {
 	
 	@PostMapping(value = "cadastrarEnderecoCobranca")
     @ResponseBody
-    public ResponseEntity<?> cadastrarEnderecoCobranca(@RequestBody Endereco end, @RequestBody String cpf){
+    public ResponseEntity<?> cadastrarEnderecoCobranca(@RequestBody EnderecoForm end){
 		
-		Pessoa pessoa = pessoaRepository.buscaPessoaPorCpf(cpf);
+		Pessoa pessoa = pessoaRepository.buscaPessoaPorCpf(end.getCpf().trim());
 		if(pessoa == null) {
 			return new ResponseEntity<String>("ESTE CLIENTE NÃO ESTÁ CADASTRADO", HttpStatus.OK);
 		}
-		pessoa.getEnderecosUsuario().add(end);
-		end.setPessoa(pessoa);
-		Endereco endereco = CadastroBo.INSTANCE.cadastrarEnderecoCobranca(end);
+		
+		Endereco endereco = CadastroBo.INSTANCE.cadastrarEnderecoCobranca(end,pessoa);
 		
 		if(endereco != null) {
 			if(enderecoRepository.buscaEnderecoPorCep(end.getNumCep()) != null)
 				return new ResponseEntity<String>("ESTE ENDERECO JA FOI CADASTRADO", HttpStatus.OK);
+			endereco.setPessoa(pessoa);		
 			endereco = enderecoRepository.save(endereco);
-			pessoa = pessoaRepository.saveAndFlush(pessoa);
 			return new ResponseEntity<Endereco>(endereco, HttpStatus.CREATED);
 		}
 		else {

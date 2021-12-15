@@ -1,5 +1,8 @@
 package com.iesb.api_loja.bo;
 
+import com.iesb.api_loja.form.CartaoForm;
+import com.iesb.api_loja.form.ClienteForm;
+import com.iesb.api_loja.form.EnderecoForm;
 import com.iesb.api_loja.model.Carrinho;
 import com.iesb.api_loja.model.Cartao;
 import com.iesb.api_loja.model.Cliente;
@@ -31,33 +34,42 @@ public class CadastroBo {
 		return prodCadastrar;
 	}
 	
-	public Cliente cadastroCliente(Cliente cliente) {
+	public Cliente cadastroCliente(ClienteForm cliente) {
 		ValidaDados.INSTANCE.validaDadosCadastroCliente(cliente);
 		Cliente clienteCadastrar = null;
+		Pessoa pessoaCadastrar = null;
 		if(ValidaDados.INSTANCE.messages.size() < 0 || ValidaDados.INSTANCE.messages.size() == 0) {
+			
+			pessoaCadastrar = new Pessoa.PessoaBuilder()
+			.nome(cliente.getNome())
+			.cpf(cliente.getCpf())
+			.email(cliente.getEmail())
+			.telefoneCelular(cliente.getTelefoneCelular())
+			.telefoneComercial(cliente.getTelefoneComercial())
+			.telefoneResidencial(cliente.getTelefoneResidencial())
+			.criarPessoa();
+			
 			clienteCadastrar = new Cliente.ClienteBuilder()
-			.dadosPessoa(cliente.getDadosPessoa())
+			.dadosPessoa(pessoaCadastrar)
 			.login(cliente.getLogin().trim())
-			.password(cliente.getPassword())
+			.password(cliente.getPassword().trim())
 			.quantidadeCompra(0)
 			.criaCliente();
-			Pessoa pessoa = clienteCadastrar.getDadosPessoa();
-			clienteCadastrar.setDadosPessoa(pessoa);
-			pessoa.setCliente(cliente);
+			
 		}
 			
 		
 		return clienteCadastrar;
 	}
 	
-	public Endereco cadastrarEnderecoEntrega(Endereco endereco) {
+	public Endereco cadastrarEnderecoEntrega(EnderecoForm endereco, Pessoa pessoa) {
 		
 		ValidaDados.INSTANCE.validaDadosEndereco(endereco);
 		Endereco enderecoCadastrar = null;
 		if(ValidaDados.INSTANCE.messages.size() < 0 || ValidaDados.INSTANCE.messages.size() == 0) 
 		enderecoCadastrar = new Endereco.EnderecoBuilder()
 		.numCep(endereco.getNumCep())
-		.pessoa(endereco.getPessoa())
+		.pessoa(pessoa)
 		.tipoEndereco(1)
 		.nomeEndereco(endereco.getNomeEndereco())
 		.criaEndereco();
@@ -65,14 +77,14 @@ public class CadastroBo {
 		return enderecoCadastrar;
 	}
 	
-	public Endereco cadastrarEnderecoCobranca(Endereco endereco) {
+	public Endereco cadastrarEnderecoCobranca(EnderecoForm endereco, Pessoa pessoa) {
 		
 		ValidaDados.INSTANCE.validaDadosEndereco(endereco);
 		Endereco enderecoCadastrar = null;
 		if(ValidaDados.INSTANCE.messages.size() < 0 || ValidaDados.INSTANCE.messages.size() == 0) 
 		enderecoCadastrar = new Endereco.EnderecoBuilder()
 		.numCep(endereco.getNumCep())
-		.pessoa(endereco.getPessoa())
+		.pessoa(pessoa)
 		.tipoEndereco(2)
 		.nomeEndereco(endereco.getNomeEndereco())
 		.criaEndereco();
@@ -80,7 +92,7 @@ public class CadastroBo {
 		return enderecoCadastrar;
 	}
 		
-	public Cartao cadastrarCartao(Cartao cartao) {
+	public Cartao cadastrarCartao(CartaoForm cartao) {
 		ValidaDados.INSTANCE.validaDadosCartao(cartao);
 		Cartao card = null;
 		if(ValidaDados.INSTANCE.messages.size() < 0 || ValidaDados.INSTANCE.messages.size() == 0) 
@@ -89,20 +101,19 @@ public class CadastroBo {
 			.numCartao(cartao.getNumCartao())
 			.CVV(cartao.getCVV())
 			.dataVencimento(cartao.getDataVencimento())
-			.cliente(cartao.getCliente())
 			.criaCartao();
 		
 		return card;
 	}
-	public Carrinho cadastraCarrinho(Carrinho car,Cliente cli) {
+	public Carrinho cadastraCarrinho(int cupom,Cliente cli, Endereco endCobraca, Endereco endEntrega) {
 		Carrinho carrinho = null;
 		
 		carrinho = new Carrinho.CarrinhoBuilder()
 		.cliente(cli)
-		.cupomDesconto(car.getCupomDesconto())
-		.enderecoEntrega(car.getEnderecoEntrega())
-		.enderecoCobranca(car.getEnderecoCobranca())
-		.qtdProdCarrinho(car.getQtdProdCarrinho())
+		.cupomDesconto(cupom)
+		.enderecoEntrega(endEntrega)
+		.enderecoCobranca(endCobraca)
+		.qtdProdCarrinho(0)
 		.estadoCarrinho(0)
 		.precoTotalCarrinho(0)
 		.tipoPagamento(1)

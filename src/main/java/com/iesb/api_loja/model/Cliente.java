@@ -14,7 +14,7 @@ import javax.persistence.SequenceGenerator;
 
 @Entity
 @SequenceGenerator(name = "seq_cliente", sequenceName = "seq_cliente", allocationSize = 1, initialValue = 1)
-public class Cliente  extends Pessoa implements Serializable{
+public class Cliente  implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	

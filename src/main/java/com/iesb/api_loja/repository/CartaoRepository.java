@@ -10,10 +10,10 @@ import com.iesb.api_loja.model.Cartao;
 @Repository
 public interface CartaoRepository extends JpaRepository<Cartao, Long>{
 	
-	@Query(value = "select card from Cartao card where card.numCartao = :numCartao ")
-	Cartao buscaCartaoPorNum(@Param("numCartao") int numCartao);
+	@Query(value = "select card from Cartao card where card.numCartao like :numCartao ")
+	Cartao buscaCartaoPorNum(@Param("numCartao") String numCartao);
 	
-	@Query(value = "select card from Cartao card join card.cliente cli where cli.id = :idCliente ")
+	@Query(value = "select card from Cartao card left join card.cliente cli where cli.id = :idCliente ")
 	Cartao buscaCartaoPorCliente(@Param("idCliente") Long idCliente);
 	
 

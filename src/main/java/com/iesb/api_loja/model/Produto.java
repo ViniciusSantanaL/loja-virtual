@@ -1,8 +1,7 @@
 package com.iesb.api_loja.model;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,7 +27,7 @@ public class Produto  implements Serializable{
 	
 	private int quantidadeEstoque;
 	
-	private Date dataCadastro;
+	private LocalDateTime dataCadastro = LocalDateTime.now();
 	
 	public Produto() {
 		
@@ -39,7 +38,6 @@ public class Produto  implements Serializable{
 		this.nome = nome;
 		this.quantidadeEstoque = quantidadeEstoque;
 		this.preco = preco;
-		setDataCadastro(Calendar.getInstance().getTime());
 	}
 
 
@@ -104,11 +102,11 @@ public class Produto  implements Serializable{
 		this.quantidadeEstoque = quantidadeEstoque;
 	}
 
-	public Date getDataCadastro() {
+	public LocalDateTime getDataCadastro() {
 		return dataCadastro;
 	}
 
-	public void setDataCadastro(Date dataVenda) {
+	public void setDataCadastro(LocalDateTime dataVenda) {
 		this.dataCadastro = dataVenda;
 	}
 

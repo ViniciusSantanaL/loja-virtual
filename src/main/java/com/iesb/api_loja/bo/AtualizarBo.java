@@ -1,5 +1,6 @@
 package com.iesb.api_loja.bo;
 
+import com.iesb.api_loja.form.ClienteForm;
 import com.iesb.api_loja.model.Cliente;
 import com.iesb.api_loja.model.Pessoa;
 import com.iesb.api_loja.model.Produto;
@@ -29,23 +30,29 @@ public class AtualizarBo {
 	}
 	
 	
-	public Cliente atualizarCliente(Cliente cliente) {
+	public Cliente atualizarCliente(ClienteForm cliente) {
 		ValidaDados.INSTANCE.validaDadosCadastroCliente(cliente);
-		Cliente clienteCadastrar = null;
+		Cliente clienteAtualizar = null;
+		Pessoa pessoaAtualizar = null;
 		if(ValidaDados.INSTANCE.messages.size() < 0 || ValidaDados.INSTANCE.messages.size() == 0) {
-			clienteCadastrar = new Cliente.ClienteBuilder()
-			.dadosPessoa(cliente.getDadosPessoa())
-			.login(cliente.getLogin().trim())
-			.password(cliente.getPassword())
-			.quantidadeCompra(0)
-			.criaCliente();
-			Pessoa pessoa = clienteCadastrar.getDadosPessoa();
-			clienteCadastrar.setDadosPessoa(pessoa);
-			pessoa.setCliente(cliente);
+			pessoaAtualizar = new Pessoa.PessoaBuilder()
+				.nome(cliente.getNome())
+				.cpf(cliente.getCpf())
+				.email(cliente.getEmail())
+				.telefoneCelular(cliente.getTelefoneCelular())
+				.telefoneComercial(cliente.getTelefoneComercial())
+				.telefoneResidencial(cliente.getTelefoneResidencial())
+				.criarPessoa();
+				
+			clienteAtualizar = new Cliente.ClienteBuilder()
+				.dadosPessoa(pessoaAtualizar)
+				.login(cliente.getLogin().trim())
+				.password(cliente.getPassword().trim())
+				.quantidadeCompra(0)
+				.criaCliente();
+				
 		}
-			
-		
-		return clienteCadastrar;
+		return clienteAtualizar;
 	}
 	
 	

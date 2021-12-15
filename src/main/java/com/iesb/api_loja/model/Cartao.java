@@ -1,18 +1,32 @@
 package com.iesb.api_loja.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 @Entity
-public class Cartao {
+@SequenceGenerator(name = "seq_cartao", sequenceName = "seq_cartao", allocationSize = 1, initialValue = 1)
+public class Cartao implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private int numCartao;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_cartao")
+	private Long id;
+	
+	
+	private String numCartao;
+	
 	private int CVV;
+	
 	private Date dataVencimento;
+	
 	private String nomeCartao;
 	
 	@ManyToOne
@@ -22,7 +36,7 @@ public class Cartao {
 		
 	}
 	
-	private Cartao(int numCartao, int cVV, Date dataVencimento, String nomeCartao, Cliente cliente) {
+	private Cartao(String numCartao, int cVV, Date dataVencimento, String nomeCartao, Cliente cliente) {
 		super();
 		this.numCartao = numCartao;
 		this.CVV = cVV;
@@ -33,7 +47,7 @@ public class Cartao {
 	
 public static class CartaoBuilder{
 	
-	private int numCartao;
+	private String numCartao;
 	
 	private int CVV;
 	
@@ -43,7 +57,7 @@ public static class CartaoBuilder{
 	
 	private Cliente cliente;
 		
-		public CartaoBuilder numCartao(int numCartao) {
+		public CartaoBuilder numCartao(String numCartao) {
 			this.numCartao = numCartao;
 			return this;
 		}
@@ -75,11 +89,11 @@ public static class CartaoBuilder{
 		
 	}
 
-	public int getNumCartao() {
+	public String getNumCartao() {
 		return numCartao;
 	}
 
-	public void setNumCartao(int numCartao) {
+	public void setNumCartao(String numCartao) {
 		this.numCartao = numCartao;
 	}
 
@@ -113,5 +127,13 @@ public static class CartaoBuilder{
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

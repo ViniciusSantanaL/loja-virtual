@@ -6,12 +6,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +24,7 @@ import com.iesb.api_loja.repository.ProdutoRepository;
 public class ProdutoController {
 	
 	@Autowired /*  CDI - INJEÇÃO DE DEPENDENCIA   */
-	private static ProdutoRepository produtoService;
+	private ProdutoRepository produtoService;
 	
 	@PostMapping(value = "cadastrarProduto")
     @ResponseBody
@@ -58,7 +56,11 @@ public class ProdutoController {
 	/*@DeleteMapping(value = "deletarProduto")
     @ResponseBody /*  Retorna os dados paara o corpo da resposta   */
 	/*public ResponseEntity<String> delete(@RequestParam String codProduto){
-    	Long idProdDel = ValidaDados.INSTANCE.podeExcluirProduto(codProduto);
+		Produto prod  = produtoService.buscaProdutoCodigo(codProduto);
+		if(prod == null) {
+			return new ResponseEntity<String>("ESTE NÃO EXISTE", HttpStatus.OK);
+		}
+		produtoService.
 	 	if(idProdDel != null) {
 	 		produtoService.deleteById(idProdDel);
 	 		return new ResponseEntity<String>("Produto Deletado com sucesso", HttpStatus.OK);

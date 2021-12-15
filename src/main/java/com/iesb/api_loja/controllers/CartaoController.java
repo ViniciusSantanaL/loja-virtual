@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iesb.api_loja.bo.CadastroBo;
 import com.iesb.api_loja.bo.ValidaDados;
+import com.iesb.api_loja.form.CartaoForm;
 import com.iesb.api_loja.model.Cartao;
 import com.iesb.api_loja.model.Cliente;
 import com.iesb.api_loja.repository.CartaoRepository;
@@ -31,19 +32,19 @@ public class CartaoController {
 	
 	@PostMapping(value = "cadastrarCartaoPagamento")
     @ResponseBody
-    public ResponseEntity<?> cadastrarCartao(@RequestBody Cartao card, @RequestBody String cpf){
+    public ResponseEntity<?> cadastrarCartao(@RequestBody CartaoForm card){
 		
-		Cliente cli = pessoaRepository.buscaClientePorCpf(cpf);
+		Cliente cli = pessoaRepository.buscaClientePorCpf(card.getCpf());
 		if(cli == null) {
 			return new ResponseEntity<String>("ESTE CLIENTE NÃO ESTÁ CADASTRADO", HttpStatus.OK);
 		}
-		card.setCliente(cli);
 	
 		Cartao cartao = CadastroBo.INSTANCE.cadastrarCartao(card);
 		
 		if(cartao != null) {
 			if(cartaoRepository.buscaCartaoPorNum(card.getNumCartao()) != null)
-				return new ResponseEntity<String>("ESTE ENDERECO JA FOI CADASTRADO", HttpStatus.OK);
+				return new ResponseEntity<String>("ESTE CARTAO JA FOI CADASTRADO", HttpStatus.OK);
+			cartao.setCliente(cli);
 			cartao = cartaoRepository.save(cartao);
 			return new ResponseEntity<Cartao>(cartao, HttpStatus.CREATED);
 		}

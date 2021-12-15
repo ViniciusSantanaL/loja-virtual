@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,9 +18,11 @@ import com.iesb.api_loja.bo.VerificaLogin;
 import com.iesb.api_loja.model.Carrinho;
 import com.iesb.api_loja.model.Cartao;
 import com.iesb.api_loja.model.Cliente;
+import com.iesb.api_loja.model.Endereco;
 import com.iesb.api_loja.model.Produto;
 import com.iesb.api_loja.repository.CarrinhoRepository;
 import com.iesb.api_loja.repository.CartaoRepository;
+import com.iesb.api_loja.repository.EnderecoRepository;
 import com.iesb.api_loja.repository.PessoaRepository;
 import com.iesb.api_loja.repository.ProdutoRepository;
 
@@ -32,22 +34,27 @@ public class CarrinhoController {
 	private CarrinhoRepository carrinhoRepository;
 	
 	@Autowired /*  CDI - INJEÇÃO DE DEPENDENCIA   */
-	private static ProdutoRepository produtoService;
+	private ProdutoRepository produtoService;
 	
 	@Autowired /*  CDI - INJEÇÃO DE DEPENDENCIA   */
 	private PessoaRepository pessoaRepository;
 	
-	//@Autowired
-	//private CartaoRepository cartaoRepository;
+	@Autowired /*  CDI - INJEÇÃO DE DEPENDENCIA   */
+	private EnderecoRepository enderecoRepository;
 	
-	@PostMapping(value = "cadastrarCarrinho")
+	@Autowired
+	private CartaoRepository cartaoRepository;
+	
+	@GetMapping(value = "cadastroCarrinho")
     @ResponseBody
-    public ResponseEntity<?> cadastrarCarrinho(@RequestBody Carrinho car, String cpf){
-		Cliente cli = pessoaRepository.buscaClientePorCpf(cpf);
+    public ResponseEntity<?> cadastrarCarrinho(@RequestParam(name = "cupom") Long cupom, @RequestParam(name = "cpfCliente") String cpfCliente){
+		Cliente cli = pessoaRepository.buscaClientePorCpf(cpfCliente);
 		if(cli == null) {
 			return new ResponseEntity<String>("ESTE CLIENTE NÃO EXISTE", HttpStatus.OK);
 		}
-		Carrinho carrinho = CadastroBo.INSTANCE.cadastraCarrinho(car,cli);
+		Endereco enderecoCobranca = enderecoRepository.buscaEnderecoCobrancaPorCliente(cpfCliente);
+		Endereco enderecoEntrega = enderecoRepository.buscaEnderecoEntregaPorCliente(cpfCliente);
+		Carrinho carrinho = CadastroBo.INSTANCE.cadastraCarrinho(0,cli,enderecoCobranca,enderecoEntrega);
 		
 		if(carrinho != null) {
 			carrinho = carrinhoRepository.save(carrinho);
@@ -59,8 +66,8 @@ public class CarrinhoController {
 	
 	@PutMapping(value = "finalizarCompra")
     @ResponseBody
-    public ResponseEntity<?> finalizarCompra(@RequestBody Long id){
-		Carrinho carrinho =  carrinhoRepository.findById(id).get();
+    public ResponseEntity<?> finalizarCompra(@RequestParam( name = "idCarrinho") Long idCarrinho){
+		Carrinho carrinho =  carrinhoRepository.findById(idCarrinho).get();
 		if(carrinho == null) {
 			return new ResponseEntity<String>("ESTE CARRINHO NÃO EXISTE", HttpStatus.OK);
 		}
@@ -78,7 +85,7 @@ public class CarrinhoController {
 	
 	@PutMapping(value = "adicionarProdutoCarrinho")
     @ResponseBody
-    public ResponseEntity<?> adicionarProdutoCarrinho(@RequestBody Long idCarrinho,String codProduto,int qtd){
+    public ResponseEntity<?> adicionarProdutoCarrinho(@RequestParam (name = "idCarrinho")Long idCarrinho,@RequestParam (name = "codProdutoCompra")String codProduto, @RequestParam (name = "qtdProduto")int qtd){
 		Carrinho carrinho =  carrinhoRepository.findById(idCarrinho).get();
 		
 		Produto produtoAdicionar = produtoService.buscaProdutoCodigo(codProduto.trim());
@@ -95,9 +102,9 @@ public class CarrinhoController {
 						carrinho.setQtdProdCarrinho(carrinho.getQtdProdCarrinho() + 1);
 						carrinho.setEstadoCarrinho(1);
 					}
-	
-					carrinhoRepository.saveAndFlush(carrinho);
 					produtoService.saveAndFlush(produtoAdicionar);
+					carrinhoRepository.saveAndFlush(carrinho);
+					
 					
 					return new ResponseEntity<Carrinho>(carrinho, HttpStatus.OK);
 				}else {
@@ -110,10 +117,10 @@ public class CarrinhoController {
 			
     }
 	
-	@PutMapping(value = "mostraDadosCompra")
+	@GetMapping(value = "mostraDadosCompra")
     @ResponseBody
-    public ResponseEntity<?> mostraDadosCompra(@RequestBody Long id){
-		Carrinho carrinho =  carrinhoRepository.buscaCarrinhoFinalizado(id);
+    public ResponseEntity<?> mostraDadosCompra(@RequestParam (name = "idCarrinho")Long idCarrinho){
+		Carrinho carrinho =  carrinhoRepository.buscaCarrinhoFinalizado(idCarrinho);
 		
 		List<Object> retorno = new ArrayList<Object>();
 		if(carrinho == null) {
@@ -122,11 +129,11 @@ public class CarrinhoController {
 		if(!(VerificaLogin.INSTANCE.verificaUsuarioLogado(carrinho.getCliente().getLogin()))) {
 			return new ResponseEntity<String>("USUARIO NÃO ESTA LOGADO", HttpStatus.OK);
 		}
-		//Cartao card = cartaoRepository.buscaCartaoPorCliente(carrinho.getCliente().getId());
+		Cartao card = cartaoRepository.buscaCartaoPorCliente(carrinho.getCliente().getId());
 		
 		
-		if(carrinho.getEstadoCarrinho() == 2) {
-			//retorno.add(card);
+		if(carrinho.getEstadoCarrinho() == 1) {
+			retorno.add(card);
 			retorno.add(carrinho);
 			
 			return new ResponseEntity<List<Object>>(retorno, HttpStatus.OK);

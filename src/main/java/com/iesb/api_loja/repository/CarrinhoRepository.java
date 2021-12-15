@@ -10,7 +10,7 @@ import com.iesb.api_loja.model.Carrinho;
 @Repository
 public interface CarrinhoRepository extends JpaRepository<Carrinho, Long>{
 	
-	@Query(value = "select car from Carrinho car where car.id = :id and car.estadoCarrinho = 2")
+	@Query(value = "select car from Carrinho car where car.id = :id and car.estadoCarrinho = 1")
 	Carrinho buscaCarrinhoFinalizado(@Param("id") Long id);
 
 }

@@ -1,21 +1,12 @@
 package com.iesb.api_loja.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
 
 @Entity
 @SequenceGenerator(name = "seq_pessoa", sequenceName = "seq_pessoa", allocationSize = 1, initialValue = 1)
@@ -27,9 +18,6 @@ public class Pessoa implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_pessoa")
 	private Long id;
 
-	@NotNull
-	@NotEmpty
-	@Length(min = 3)
 	private String nome;
 
 	private String cpf;
@@ -41,13 +29,7 @@ public class Pessoa implements Serializable {
 	private String telefoneResidencial;
 
 	private String email;
-	
-	@OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-	private Cliente cliente;
-	
-	@OneToMany(mappedBy = "pessoa",cascade = CascadeType.ALL)
-	private List<Endereco> enderecosUsuario = new ArrayList<Endereco>();
-
+		
 	public Pessoa() {
 
 	}
@@ -172,23 +154,6 @@ public class Pessoa implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
-	public List<Endereco> getEnderecosUsuario() {
-		return enderecosUsuario;
-	}
-
-	public void setEnderecosUsuario(List<Endereco> enderecosUsuario) {
-		this.enderecosUsuario = enderecosUsuario;
-	}
-	
+	}	
 
 }

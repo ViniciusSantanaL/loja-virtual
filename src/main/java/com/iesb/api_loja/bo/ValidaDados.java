@@ -6,9 +6,9 @@ import java.util.List;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import com.iesb.api_loja.model.Cartao;
-import com.iesb.api_loja.model.Cliente;
-import com.iesb.api_loja.model.Endereco;
+import com.iesb.api_loja.form.CartaoForm;
+import com.iesb.api_loja.form.ClienteForm;
+import com.iesb.api_loja.form.EnderecoForm;
 import com.iesb.api_loja.model.Produto;
 
 import br.com.caelum.stella.ValidationMessage;
@@ -69,7 +69,7 @@ public class ValidaDados {
 
 	private boolean validaCep(int cep) {
 		Check check = new SafeguardCheck();
-		boolean hasError = check.elementOf(Integer.toString(cep), ParametroTipo.CPF).validate().hasError();
+		boolean hasError = check.elementOf(Integer.toString(cep), ParametroTipo.CEP).validate().hasError();
 		if (hasError)
 			messages.add("CEP INVÁLIDO !! - ");
 
@@ -95,27 +95,27 @@ public class ValidaDados {
 
 	}
 
-	public void validaDadosCadastroCliente(Cliente cliente) {
+	public void validaDadosCadastroCliente(ClienteForm cliente) {
 
-		if (!(validaCPF(cliente.getDadosPessoa().getCpf())))
+		if (!(validaCPF(cliente.getCpf())))
 			messages.add("CPF INVÁLIDO !! - ");
-		if (!(validaEmail(cliente.getDadosPessoa().getEmail())))
+		if (!(validaEmail(cliente.getEmail())))
 			messages.add("EMAIL INVÁLIDO !! - ");
-		if (cliente.getDadosPessoa().getTelefoneCelular() != null
-				|| !(cliente.getDadosPessoa().getTelefoneCelular().isEmpty()))
-			if (validaTelefone(cliente.getDadosPessoa().getTelefoneCelular())) {
+		if (cliente.getTelefoneCelular() != null
+				|| !(cliente.getTelefoneCelular().isEmpty()))
+			if (validaTelefone(cliente.getTelefoneCelular())) {
 				messages.add("TELEFONE CELULAR INVÁLIDO !! - ");
 			}
 
-		if (cliente.getDadosPessoa().getTelefoneComercial() != null
-				|| !(cliente.getDadosPessoa().getTelefoneComercial().isEmpty()))
-			if (validaTelefone(cliente.getDadosPessoa().getTelefoneComercial())) {
+		if (cliente.getTelefoneComercial() != null
+				|| !(cliente.getTelefoneComercial().isEmpty()))
+			if (validaTelefone(cliente.getTelefoneComercial())) {
 				messages.add("TELEFONE COMERCIAL INVÁLIDO !! - ");
 			}
 
-		if (cliente.getDadosPessoa().getTelefoneResidencial() != null
-				|| !(cliente.getDadosPessoa().getTelefoneResidencial().isEmpty()))
-			if (validaTelefone(cliente.getDadosPessoa().getTelefoneResidencial())) {
+		if (cliente.getTelefoneResidencial() != null
+				|| !(cliente.getTelefoneResidencial().isEmpty()))
+			if (validaTelefone(cliente.getTelefoneResidencial())) {
 				messages.add("TELEFONE RESIDENCIAL INVÁLIDO !! - ");
 			}
 
@@ -127,13 +127,13 @@ public class ValidaDados {
 
 	}
 
-	public void validaDadosEndereco(Endereco end) {
+	public void validaDadosEndereco(EnderecoForm end) {
 		validaCep(end.getNumCep());
 	}
 	
-	public void validaDadosCartao(Cartao card) {
+	public void validaDadosCartao(CartaoForm card) {
 	
-		if(!(validaNumCartao(Integer.toString(card.getNumCartao())))) {
+		if(!(validaNumCartao(card.getNumCartao()))) {
 			messages.add("CARTÃO INVALIDO ");
 		}
 			
